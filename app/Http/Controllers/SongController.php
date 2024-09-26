@@ -26,15 +26,12 @@ class SongController extends Controller {
 
     public function store( Request $request ) {
         
-        $request->validate([
+        $validatedData = $request->validate([
             'title' => 'required|string|max:100',
             'singer' => 'nullable|string',
         ]);
         
-        Song::create([
-            'title' => $request->input('title'),
-            'singer' => $request->input('singer'),
-        ]);
+        Song::create($validatedData);
         
         return redirect()->route('songs.index');
     }
@@ -44,7 +41,7 @@ class SongController extends Controller {
     */
 
     public function show( $id ) {
-        $song = Song::find($id); // Haal een specifiek nummer op op basis van het id
+        $song = Song::find($id); // Haal een specifiek nummer van het id
         return view('show', [ 'song' => $song ] );
     }
 
@@ -62,15 +59,16 @@ class SongController extends Controller {
     */
 
     public function update( Request $request, $id ) {
-        $request->validate([
+        $validatedData = $request->validate([
             'title' => 'required|string|max:100',
-            'singer' => 'nullable|string',
+            'singer' => 'string|max:255',
         ]);
 
-        $song = Song::find($id);
-        $song->title = $request->input('title');
-        $song->singer = $request->input('singer');
-        $song->save();
+        Song::findOrFail($id)->update($validatedData);
+        // $song = Song::find($id);
+        // $song->title = $request->input('title');
+        // $song->singer = $request->input('singer');
+        // $song->save();
         return redirect()->route('songs.index');
     }
 
